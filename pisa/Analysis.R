@@ -42,9 +42,9 @@ analysis <- function(r){
   print(r)
   
   result = rep(0, 8)
-  rho = 5
   C2 <- 2*sqrt(r/p)
   C = 2*sqrt(r)
+  rho = C^2
   
   res1 = NBE(rho, r, data.train, M0, Omega, tot)
   result[1] = lik(res1$M,data.test,Omega.test,tot)
@@ -52,11 +52,11 @@ analysis <- function(r){
   res2 = refi.nosp(res1$M, r, data.train, Omega,  C2,tot,C)
   result[2] = lik(res2$M,data.test,Omega.test,tot)
   
-  res3.1 = refi.sp(res1$M, r, data.train, Omega,  C2,tot,C)
-  res3.2 = refi.sp(res1$M, r, data.train, Omega,  C2,tot,C)
-  res3.3 = refi.sp(res1$M, r, data.train, Omega,  C2,tot,C)
-  res3.4 = refi.sp(res1$M, r, data.train, Omega,  C2,tot,C)
-  res3.5 = refi.sp(res1$M, r, data.train, Omega,  C2,tot,C)
+  res3.1 = refi.sp.nbe(res1$M, r, data.train, Omega,  C2,tot,rho)
+  res3.2 = refi.sp.nbe(res1$M, r, data.train, Omega,  C2,tot,rho)
+  res3.3 = refi.sp.nbe(res1$M, r, data.train, Omega,  C2,tot,rho)
+  res3.4 = refi.sp.nbe(res1$M, r, data.train, Omega,  C2,tot,rho)
+  res3.5 = refi.sp.nbe(res1$M, r, data.train, Omega,  C2,tot,rho)
   
   result[3] = lik(res3.1$M,data.test,Omega.test,tot)
   
@@ -74,29 +74,19 @@ analysis <- function(r){
   res6 = refi.nosp(res5$M, r, data.train, Omega,  C2,tot,C)
   result[6] = lik(res6$M,data.test,Omega.test,tot)
   
-  res7.1 = refi.sp(res5$M, r, data.train, Omega,  C2,tot,C)
-  res7.2 = refi.sp(res5$M, r, data.train, Omega,  C2,tot,C)
-  res7.3 = refi.sp(res5$M, r, data.train, Omega,  C2,tot,C)
-  res7.4 = refi.sp(res5$M, r, data.train, Omega,  C2,tot,C)
-  res7.5 = refi.sp(res5$M, r, data.train, Omega,  C2,tot,C)
+  res7.1 = refi.sp.jml(res5$Theta,res5$A, r, data.train, Omega,  C2,tot,C)
+  res7.2 = refi.sp.jml(res5$Theta,res5$A, r, data.train, Omega,  C2,tot,C)
+  res7.3 = refi.sp.jml(res5$Theta,res5$A, r, data.train, Omega,  C2,tot,C)
+  res7.4 = refi.sp.jml(res5$Theta,res5$A, r, data.train, Omega,  C2,tot,C)
+  res7.5 = refi.sp.jml(res5$Theta,res5$A, r, data.train, Omega,  C2,tot,C)
+  
   result[7] = lik(res7.1$M,data.test,Omega.test,tot)
-  
-  
+
   res8 = (res7.1$M + res7.2$M+ res7.3$M+ res7.4$M+ res7.5$M)/5
   
   result[8] = lik(res8,data.test,Omega.test,tot)
   filename = paste("rank", r, ".Rdata", sep="")
   save(result, file = filename)
 }
-
+library(parallel)
 r = mclapply(r.vec, analysis, mc.cores=4)
-
-
-
- 
- 
- 
-
-
-
-

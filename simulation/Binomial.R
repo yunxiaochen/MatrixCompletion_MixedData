@@ -72,8 +72,8 @@ NBE <- function(rho, r, data, M0, Omega, tot, step = 1){
   M1 = linesearch(obj0, M0, grad, data, Omega,tot, rho, r, n, p)
   obj1 = lik(M1, data, Omega, tot)
   
-  while(obj1-obj0 > 1e-4){
-   # print(obj1-obj0)
+  while(obj1-obj0 > 5e-3){
+    #print(obj1-obj0)
     obj0 = obj1
     M0 = M1
     grad = grad(M0, data, Omega,tot)
@@ -220,7 +220,7 @@ update.Theta <- function(data, Omega, tot, A0, Theta0, step = 1, times = 10){
   Theta1 =  search.Theta(grad, grad2, data, Omega, tot, A0, Theta0, step, times)
   obj1 = lik(Theta1%*% t(A0), data, Omega, tot)
   
-  while(abs(obj1-obj0) > 1e-4){
+  while(abs(obj1-obj0) > 1e-3){
     obj0 = obj1
     Theta0 = Theta1
     grad = grad.Theta(data, Omega, tot, A0, Theta0)
@@ -238,7 +238,7 @@ update.A <- function(data, Omega, tot, A0, Theta0, step = 1, times = 10){
   grad2 = grad2.A(data, Omega, tot, A0, Theta0)
   A1 = search.A(grad, grad2, data, Omega, tot, A0, Theta0, step, times)
   obj1 = lik(Theta0%*% t(A1), data, Omega, tot)
-  while(abs(obj1-obj0) > 1e-4){
+  while(abs(obj1-obj0) > 1e-3){
     obj0 = obj1
     A0 = A1
     grad = grad.A(data, Omega, tot, A0, Theta0)
@@ -260,7 +260,7 @@ update.Theta.C <- function(data, Omega, tot, A0, Theta0, C, step = 1, times = 10
   Theta1 =  search.Theta.C(grad, grad2, data, Omega, tot, A0, Theta0, C, step, times)
   obj1 = lik(Theta1%*% t(A0), data, Omega, tot)
   
-  while(abs(obj1-obj0) > 1e-4){
+  while(abs(obj1-obj0) > 1e-3){
     obj0 = obj1
     Theta0 = Theta1
     grad = grad.Theta(data, Omega, tot, A0, Theta0)
@@ -280,7 +280,7 @@ update.A.C <- function(data, Omega, tot, A0, Theta0, C, step = 1, times = 10){
   A1 = search.A.C(grad, grad2, data, Omega, tot, A0, Theta0, C, step, times)
   obj1 = lik(Theta0%*% t(A1), data, Omega, tot)
   
-  while(abs(obj1-obj0) > 1e-4){
+  while(abs(obj1-obj0) > 1e-3){
     obj0 = obj1
     A0 = A1
     grad = grad.A(data, Omega, tot, A0, Theta0)
@@ -312,14 +312,14 @@ CJMLE <- function(Theta0, A0, r, data, Omega,  C,tot){
   
   obj1 = lik(Theta0%*% t(A0), data, Omega, tot)
   
-  while(abs(obj1-obj0) > 1e-3){
+  while(abs(obj1-obj0) > 1e-2){
     obj0 = obj1
     Theta0 = update.Theta.C(data, Omega, tot, A0, Theta0,C)
     A0 = update.A.C(data, Omega, tot, A0, Theta0,C)
     obj1 = lik(Theta0%*% t(A0), data, Omega, tot)
   #  print(obj1)
   }
-  list(M = Theta0 %*% t(A0))  
+  list(M = Theta0 %*% t(A0), Theta = Theta0, A = A0)  
 }
 
 
@@ -327,10 +327,7 @@ CJMLE <- function(Theta0, A0, r, data, Omega,  C,tot){
 #===================================================Functions for refinement for binary/ordinal data; With splitting
 
 
-refi.sp <- function(M, r, data, Omega,  C2,tot){
-  
-  
-  
+refi.sp.nbe <- function(M, r, data, Omega,  C2,tot,rho){
   
   n=nrow(data)
   split = rbinom(n, 1, 0.5)
@@ -341,9 +338,8 @@ refi.sp <- function(M, r, data, Omega,  C2,tot){
   Omega1 = Omega[split==0,]
   Omega2 = Omega[split==1,]
   
-  M1 = M[split==0,]
-  M2 = M[split==1,]
-  
+  M1 = NBE(rho, r, data1, M[split==0,], Omega1, tot)$M
+  M2 = NBE(rho, r, data2, M[split==1,], Omega2, tot)$M
   
   svd.res1 = svd(round(M1,8))
   A10 = proj(svd.res1$v[,1:r], C2)
@@ -368,6 +364,48 @@ refi.sp <- function(M, r, data, Omega,  C2,tot){
   list(M = M)
 }
 
+
+
+refi.sp.jml <- function(Theta0, A0, r, data, Omega,  C2,tot,C){
+  
+  
+  
+  
+  n=nrow(data)
+  split = rbinom(n, 1, 0.5)
+  
+  data1 = data[split==0,]
+  data2 = data[split==1,]
+  
+  Omega1 = Omega[split==0,]
+  Omega2 = Omega[split==1,]
+  
+  M = Theta0 %*% t(A0)
+  est1 = CJMLE(Theta0[split==0,], A0, r, data1, Omega1,  C,tot)
+  est2 = CJMLE(Theta0[split==1,], A0, r, data2, Omega2,  C,tot)
+  
+#  svd.res1 = svd(round(M1,8))
+#  A10 = proj(svd.res1$v[,1:r], C2)
+#  Theta10 = svd.res1$u[,1:r] %*% diag(svd.res1$d[1:r])
+  
+  
+#  svd.res2 = svd(round(M2,8))
+#  A20 = proj(svd.res2$v[,1:r], C2)
+#  Theta20 = svd.res2$u[,1:r] %*% diag(svd.res2$d[1:r])
+  
+  
+  Theta2 = update.Theta(data2, Omega2, tot, est1$A, est2$Theta)
+  A1 = update.A(data2, Omega2, tot, est1$A, Theta2)
+  
+  
+  Theta1 = update.Theta(data1, Omega1, tot, est2$A, est1$Theta)
+  A2 = update.A(data1, Omega1, tot, est2$A, Theta1)
+  
+  M[split==0,] = Theta1 %*% t(A2)
+  M[split==1,] = Theta2 %*% t(A1)
+  
+  list(M = M)
+}
 
 #====================Evaluation
 

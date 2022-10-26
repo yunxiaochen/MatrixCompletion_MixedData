@@ -30,22 +30,21 @@ simulation <- function(i){
   Omega <- matrix(rbinom(n*p,1,pi), n,p) 
   
   
-  M0 = data
-  M0[data==0] = 0.2
-  M0[data!=0] = 0.8  
+  M0 = temp
+  
   
   res1 = NBE(rho, r, data, M0, Omega, tot)
   res2 = refi.nosp(res1$M, r, data, Omega,  C2,tot)
   
-  res3.1 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.2 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.3 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.4 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.5 = refi.sp(res1$M, r, data, Omega,  C2,tot)
+  res3.1 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.2 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.3 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.4 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.5 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
   
   res4 = (res3.1$M + res3.2$M + res3.3$M + res3.4$M+ res3.5$M)/5
   
-  svd.res = svd(round(res1$M,8))
+  svd.res = svd(round(res2$M,8))
   Theta0 = proj((svd.res$u[,1:r] *sqrt(n)) %*% diag(sqrt(svd.res$d[1:r]/sqrt(n*p))),C)
   A0 = proj((svd.res$v[,1:r] *sqrt(p)) %*% diag(sqrt(svd.res$d[1:r]/sqrt(n*p))),C)
   
@@ -53,11 +52,11 @@ simulation <- function(i){
   
   res6 = refi.nosp(res5$M, r, data, Omega,  C2,tot)
   
-  res7.1 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.2 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.3 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.4 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.5 = refi.sp(res5$M, r, data, Omega,  C2,tot)
+  res7.1 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.2 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.3 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.4 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.5 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
   
   
   res8 = (res7.1$M + res7.2$M+ res7.3$M+ res7.4$M+ res7.5$M)/5
@@ -101,23 +100,21 @@ simulation <- function(i){
   Omega <- matrix(rbinom(n*p,1,pi), n,p) 
   
   
-  M0 = data
-  M0[data==0] = 0.2
-  M0[data==1] = 0.8
+  M0 = temp
   
   
   res1 = NBE(rho, r, data, M0, Omega, tot)
   res2 = refi.nosp(res1$M, r, data, Omega,  C2,tot)
   
-  res3.1 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.2 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.3 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.4 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.5 = refi.sp(res1$M, r, data, Omega,  C2,tot)
+  res3.1 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.2 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.3 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.4 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.5 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
   
   res4 = (res3.1$M + res3.2$M + res3.3$M + res3.4$M+ res3.5$M)/5
   
-  svd.res = svd(round(res1$M,8))
+  svd.res = svd(round(res2$M,8))
   Theta0 = proj((svd.res$u[,1:r] *sqrt(n)) %*% diag(sqrt(svd.res$d[1:r]/sqrt(n*p))),C)
   A0 = proj((svd.res$v[,1:r] *sqrt(p)) %*% diag(sqrt(svd.res$d[1:r]/sqrt(n*p))),C)
   
@@ -125,11 +122,11 @@ simulation <- function(i){
   
   res6 = refi.nosp(res5$M, r, data, Omega,  C2,tot)
   
-  res7.1 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.2 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.3 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.4 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.5 = refi.sp(res5$M, r, data, Omega,  C2,tot)
+  res7.1 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.2 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.3 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.4 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.5 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
   
   
   res8 = (res7.1$M + res7.2$M+ res7.3$M+ res7.4$M+ res7.5$M)/5
@@ -173,23 +170,21 @@ simulation <- function(i){
   Omega <- matrix(rbinom(n*p,1,pi), n,p) 
   
   
-  M0 = data
-  M0[data==0] = 0.2
-  M0[data==1] = 0.8
+  M0 = temp
   
   
   res1 = NBE(rho, r, data, M0, Omega, tot)
   res2 = refi.nosp(res1$M, r, data, Omega,  C2,tot)
   
-  res3.1 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.2 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.3 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.4 = refi.sp(res1$M, r, data, Omega,  C2,tot)
-  res3.5 = refi.sp(res1$M, r, data, Omega,  C2,tot)
+  res3.1 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.2 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.3 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.4 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
+  res3.5 = refi.sp.nbe(res1$M, r, data, Omega,  C2,tot,rho)
   
   res4 = (res3.1$M + res3.2$M + res3.3$M + res3.4$M+ res3.5$M)/5
   
-  svd.res = svd(round(res1$M,8))
+  svd.res = svd(round(res2$M,8))
   Theta0 = proj((svd.res$u[,1:r] *sqrt(n)) %*% diag(sqrt(svd.res$d[1:r]/sqrt(n*p))),C)
   A0 = proj((svd.res$v[,1:r] *sqrt(p)) %*% diag(sqrt(svd.res$d[1:r]/sqrt(n*p))),C)
   
@@ -197,11 +192,11 @@ simulation <- function(i){
   
   res6 = refi.nosp(res5$M, r, data, Omega,  C2,tot)
   
-  res7.1 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.2 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.3 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.4 = refi.sp(res5$M, r, data, Omega,  C2,tot)
-  res7.5 = refi.sp(res5$M, r, data, Omega,  C2,tot)
+  res7.1 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.2 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.3 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.4 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
+  res7.5 = refi.sp.jml(res5$Theta,res5$A, r, data, Omega,  C2,tot,C)
   
   
   res8 = (res7.1$M + res7.2$M+ res7.3$M+ res7.4$M+ res7.5$M)/5

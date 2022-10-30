@@ -30,8 +30,9 @@ simulation <- function(i){
   Omega <- matrix(rbinom(n*p,1,pi), n,p) 
   
   
-  M0 = temp
-  
+  M0 = data
+  M0[data <= 2] =-0.5
+  M0[data > 2] = 0.5    
   
   res1 = NBE(rho, r, data, M0, Omega, tot)
   res2 = refi.nosp(res1$M, r, data, Omega,  C2,tot)
@@ -102,8 +103,9 @@ simulation <- function(i){
   Omega <- matrix(rbinom(n*p,1,pi), n,p) 
   
   
-  M0 = temp
-  
+  M0 = data
+  M0[data <= 2] =-0.5
+  M0[data > 2] = 0.5    
   
   res1 = NBE(rho, r, data, M0, Omega, tot)
   res2 = refi.nosp(res1$M, r, data, Omega,  C2,tot)
@@ -173,8 +175,9 @@ simulation <- function(i){
   Omega <- matrix(rbinom(n*p,1,pi), n,p) 
   
   
-  M0 = temp
-  
+  M0 = data
+  M0[data <= 2] =-0.5
+  M0[data > 2] = 0.5    
   
   res1 = NBE(rho, r, data, M0, Omega, tot)
   res2 = refi.nosp(res1$M, r, data, Omega,  C2,tot)
